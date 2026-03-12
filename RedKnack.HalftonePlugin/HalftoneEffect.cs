@@ -44,24 +44,24 @@ namespace RedKnack.HalftonePlugin
 
     public sealed class HalftoneEffect : PropertyBasedEffect
     {
-        private int          _cellSize;
-        private DotShape     _dotShape;
+        private int _cellSize;
+        private DotShape _dotShape;
         private DotSizeCurve _sizeCurve;
-        private ColorMode    _colorMode;
+        private ColorMode _colorMode;
 
         private double _angleSingle;
         private double _angleCyan, _angleMagenta, _angleYellow, _angleBlack;
 
         private double _softEdge;
         private double _minDot, _maxDot;
-        private bool   _invert;
+        private bool _invert;
         private double _ringWidth;
 
         private ColorBgra _backgroundColor;
         private ColorBgra _spotColor;
 
         private double _blackPoint, _whitePoint;
-        private int    _oversample;
+        private int _oversample;
 
         private HalftoneRenderer? _renderer;
 
@@ -83,16 +83,16 @@ namespace RedKnack.HalftonePlugin
 
         protected override PropertyCollection OnCreatePropertyCollection()
         {
-            object[] dotShapes  = Enum.GetValues(typeof(DotShape))   .Cast<object>().ToArray();
+            object[] dotShapes = Enum.GetValues(typeof(DotShape)).Cast<object>().ToArray();
             object[] sizeCurves = Enum.GetValues(typeof(DotSizeCurve)).Cast<object>().ToArray();
-            object[] colorModes = Enum.GetValues(typeof(ColorMode))  .Cast<object>().ToArray();
+            object[] colorModes = Enum.GetValues(typeof(ColorMode)).Cast<object>().ToArray();
 
             var props = new List<Property>
             {
                 new Int32Property(PropertyNames.CellSize, 20, 2, 120),
-                new StaticListChoiceProperty(PropertyNames.DotShape,     dotShapes,  (int)DotShape.Circle,              false),
-                new StaticListChoiceProperty(PropertyNames.DotSizeCurve, sizeCurves, (int)DotSizeCurve.AreaProportional, false),
-                new StaticListChoiceProperty(PropertyNames.ColorMode,    colorModes, (int)ColorMode.CMYK,               false),
+                new StaticListChoiceProperty(PropertyNames.DotShape,     dotShapes,  (int)DotShape.Circle,               false),
+                new StaticListChoiceProperty(PropertyNames.DotSizeCurve, sizeCurves, (int)DotSizeCurve.AreaProportional,  false),
+                new StaticListChoiceProperty(PropertyNames.ColorMode,    colorModes, (int)ColorMode.CMYK,                false),
 
                 new DoubleProperty(PropertyNames.ScreenAngle,   45.0,   0.0, 179.0),
                 new DoubleProperty(PropertyNames.AngleCyan,     15.0,   0.0, 179.0),
@@ -126,26 +126,26 @@ namespace RedKnack.HalftonePlugin
                     PropertyNames.ScreenAngle,
                     PropertyNames.ColorMode,
                     (object)ColorMode.CMYK,
-                    true),
+                    false),
 
                 new ReadOnlyBoundToValueRule<object, StaticListChoiceProperty>(
-                    PropertyNames.AngleCyan,    PropertyNames.ColorMode, (object)ColorMode.CMYK, false),
+                    PropertyNames.AngleCyan,    PropertyNames.ColorMode, (object)ColorMode.CMYK, true),
                 new ReadOnlyBoundToValueRule<object, StaticListChoiceProperty>(
-                    PropertyNames.AngleMagenta, PropertyNames.ColorMode, (object)ColorMode.CMYK, false),
+                    PropertyNames.AngleMagenta, PropertyNames.ColorMode, (object)ColorMode.CMYK, true),
                 new ReadOnlyBoundToValueRule<object, StaticListChoiceProperty>(
-                    PropertyNames.AngleYellow,  PropertyNames.ColorMode, (object)ColorMode.CMYK, false),
+                    PropertyNames.AngleYellow,  PropertyNames.ColorMode, (object)ColorMode.CMYK, true),
                 new ReadOnlyBoundToValueRule<object, StaticListChoiceProperty>(
-                    PropertyNames.AngleBlack,   PropertyNames.ColorMode, (object)ColorMode.CMYK, false),
+                    PropertyNames.AngleBlack,   PropertyNames.ColorMode, (object)ColorMode.CMYK, true),
 
                 new ReadOnlyBoundToValueRule<object, StaticListChoiceProperty>(
-                    PropertyNames.SpotR, PropertyNames.ColorMode, (object)ColorMode.SpotColor, false),
+                    PropertyNames.SpotR, PropertyNames.ColorMode, (object)ColorMode.SpotColor, true),
                 new ReadOnlyBoundToValueRule<object, StaticListChoiceProperty>(
-                    PropertyNames.SpotG, PropertyNames.ColorMode, (object)ColorMode.SpotColor, false),
+                    PropertyNames.SpotG, PropertyNames.ColorMode, (object)ColorMode.SpotColor, true),
                 new ReadOnlyBoundToValueRule<object, StaticListChoiceProperty>(
-                    PropertyNames.SpotB, PropertyNames.ColorMode, (object)ColorMode.SpotColor, false),
+                    PropertyNames.SpotB, PropertyNames.ColorMode, (object)ColorMode.SpotColor, true),
 
                 new ReadOnlyBoundToValueRule<object, StaticListChoiceProperty>(
-                    PropertyNames.RingWidth, PropertyNames.DotShape, (object)DotShape.Ring, false),
+                    PropertyNames.RingWidth, PropertyNames.DotShape, (object)DotShape.Ring, true),
             };
 
             return new PropertyCollection(props, rules);
@@ -155,33 +155,33 @@ namespace RedKnack.HalftonePlugin
         {
             ControlInfo ui = CreateDefaultConfigUI(props);
 
-            SetLabel(ui, PropertyNames.CellSize,         "Cell Size (px)");
-            SetLabel(ui, PropertyNames.DotShape,         "Dot Shape");
-            SetLabel(ui, PropertyNames.DotSizeCurve,     "Tone Curve");
-            SetLabel(ui, PropertyNames.ColorMode,        "Color Mode");
+            SetLabel(ui, PropertyNames.CellSize, "Cell Size (px)");
+            SetLabel(ui, PropertyNames.DotShape, "Dot Shape");
+            SetLabel(ui, PropertyNames.DotSizeCurve, "Tone Curve");
+            SetLabel(ui, PropertyNames.ColorMode, "Color Mode");
 
-            SetLabel(ui, PropertyNames.ScreenAngle,      "Screen Angle [deg] — Grayscale / Spot / RGB");
-            SetLabel(ui, PropertyNames.AngleCyan,        "Cyan Angle [deg]");
-            SetLabel(ui, PropertyNames.AngleMagenta,     "Magenta Angle [deg]");
-            SetLabel(ui, PropertyNames.AngleYellow,      "Yellow Angle [deg]");
-            SetLabel(ui, PropertyNames.AngleBlack,       "Black Angle [deg]");
+            SetLabel(ui, PropertyNames.ScreenAngle, "Screen Angle [deg] — Grayscale / Spot / RGB");
+            SetLabel(ui, PropertyNames.AngleCyan, "Cyan Angle [deg]");
+            SetLabel(ui, PropertyNames.AngleMagenta, "Magenta Angle [deg]");
+            SetLabel(ui, PropertyNames.AngleYellow, "Yellow Angle [deg]");
+            SetLabel(ui, PropertyNames.AngleBlack, "Black Angle [deg]");
 
-            SetLabel(ui, PropertyNames.SoftEdge,         "Edge Softness (px)");
-            SetLabel(ui, PropertyNames.MinDotSize,       "Min Dot Size (%)");
-            SetLabel(ui, PropertyNames.MaxDotSize,       "Max Dot Size (%)");
-            SetLabel(ui, PropertyNames.Invert,           "Invert");
-            SetLabel(ui, PropertyNames.RingWidth,        "Ring Width [Ring shape only]");
+            SetLabel(ui, PropertyNames.SoftEdge, "Edge Softness (px)");
+            SetLabel(ui, PropertyNames.MinDotSize, "Min Dot Size (%)");
+            SetLabel(ui, PropertyNames.MaxDotSize, "Max Dot Size (%)");
+            SetLabel(ui, PropertyNames.Invert, "Invert");
+            SetLabel(ui, PropertyNames.RingWidth, "Ring Width [Ring shape only]");
 
-            SetLabel(ui, PropertyNames.BackgroundR,      "Background Red");
-            SetLabel(ui, PropertyNames.BackgroundG,      "Background Green");
-            SetLabel(ui, PropertyNames.BackgroundB,      "Background Blue");
+            SetLabel(ui, PropertyNames.BackgroundR, "Background Red");
+            SetLabel(ui, PropertyNames.BackgroundG, "Background Green");
+            SetLabel(ui, PropertyNames.BackgroundB, "Background Blue");
 
-            SetLabel(ui, PropertyNames.SpotR,            "Spot Color Red [SpotColor only]");
-            SetLabel(ui, PropertyNames.SpotG,            "Spot Color Green [SpotColor only]");
-            SetLabel(ui, PropertyNames.SpotB,            "Spot Color Blue [SpotColor only]");
+            SetLabel(ui, PropertyNames.SpotR, "Spot Color Red [SpotColor only]");
+            SetLabel(ui, PropertyNames.SpotG, "Spot Color Green [SpotColor only]");
+            SetLabel(ui, PropertyNames.SpotB, "Spot Color Blue [SpotColor only]");
 
-            SetLabel(ui, PropertyNames.BlackPoint,       "Black Point (%)");
-            SetLabel(ui, PropertyNames.WhitePoint,       "White Point (%)");
+            SetLabel(ui, PropertyNames.BlackPoint, "Black Point (%)");
+            SetLabel(ui, PropertyNames.WhitePoint, "White Point (%)");
 
             SetLabel(ui, PropertyNames.OversampleFactor, "Quality / Oversampling (1=Fast, 4=Max)");
             SetLabel(ui, PropertyNames.ThisDoesNothingLol, "Skibidi");
@@ -196,21 +196,21 @@ namespace RedKnack.HalftonePlugin
 
         protected override void OnSetRenderInfo(PropertyBasedEffectConfigToken token, RenderArgs dstArgs, RenderArgs srcArgs)
         {
-            _cellSize  = token.GetProperty<Int32Property>(PropertyNames.CellSize).Value;
-            _dotShape  = (DotShape)     token.GetProperty<StaticListChoiceProperty>(PropertyNames.DotShape).Value;
-            _sizeCurve = (DotSizeCurve) token.GetProperty<StaticListChoiceProperty>(PropertyNames.DotSizeCurve).Value;
-            _colorMode = (ColorMode)    token.GetProperty<StaticListChoiceProperty>(PropertyNames.ColorMode).Value;
+            _cellSize = token.GetProperty<Int32Property>(PropertyNames.CellSize).Value;
+            _dotShape = (DotShape)token.GetProperty<StaticListChoiceProperty>(PropertyNames.DotShape).Value;
+            _sizeCurve = (DotSizeCurve)token.GetProperty<StaticListChoiceProperty>(PropertyNames.DotSizeCurve).Value;
+            _colorMode = (ColorMode)token.GetProperty<StaticListChoiceProperty>(PropertyNames.ColorMode).Value;
 
-            _angleSingle  = token.GetProperty<DoubleProperty>(PropertyNames.ScreenAngle).Value;
-            _angleCyan    = token.GetProperty<DoubleProperty>(PropertyNames.AngleCyan).Value;
+            _angleSingle = token.GetProperty<DoubleProperty>(PropertyNames.ScreenAngle).Value;
+            _angleCyan = token.GetProperty<DoubleProperty>(PropertyNames.AngleCyan).Value;
             _angleMagenta = token.GetProperty<DoubleProperty>(PropertyNames.AngleMagenta).Value;
-            _angleYellow  = token.GetProperty<DoubleProperty>(PropertyNames.AngleYellow).Value;
-            _angleBlack   = token.GetProperty<DoubleProperty>(PropertyNames.AngleBlack).Value;
+            _angleYellow = token.GetProperty<DoubleProperty>(PropertyNames.AngleYellow).Value;
+            _angleBlack = token.GetProperty<DoubleProperty>(PropertyNames.AngleBlack).Value;
 
-            _softEdge  = token.GetProperty<DoubleProperty>(PropertyNames.SoftEdge).Value;
-            _minDot    = token.GetProperty<DoubleProperty>(PropertyNames.MinDotSize).Value / 100.0;
-            _maxDot    = token.GetProperty<DoubleProperty>(PropertyNames.MaxDotSize).Value / 100.0;
-            _invert    = token.GetProperty<BooleanProperty>(PropertyNames.Invert).Value;
+            _softEdge = token.GetProperty<DoubleProperty>(PropertyNames.SoftEdge).Value;
+            _minDot = token.GetProperty<DoubleProperty>(PropertyNames.MinDotSize).Value / 100.0;
+            _maxDot = token.GetProperty<DoubleProperty>(PropertyNames.MaxDotSize).Value / 100.0;
+            _invert = token.GetProperty<BooleanProperty>(PropertyNames.Invert).Value;
             _ringWidth = token.GetProperty<DoubleProperty>(PropertyNames.RingWidth).Value;
 
             int bgR = token.GetProperty<Int32Property>(PropertyNames.BackgroundR).Value;
